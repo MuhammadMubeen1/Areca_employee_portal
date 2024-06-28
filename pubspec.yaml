@@ -1,0 +1,67 @@
+name: employe_portal
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.1 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+ 
+ 
+
+  firebase_core: ^2.25.4
+  firebase_auth: ^4.17.4
+  permission_handler: ^11.3.0
+  firebase_storage: 
+  mailer:
+  country_picker: 
+  cloud_firestore:
+  url_launcher: 
+  date_format: ^2.0.7
+  intl_phone_field: ^3.1.0 
+  fluttertoast: ^8.2.4
+  file_picker: ^8.0.5
+  flutter_native_image:
+  shared_preferences: ^2.2.2
+  path_provider: 
+  flutter_pdfview: ^1.0.7
+
+  flutter_downloader: 
+ 
+  email_otp: 
+  http: 
+
+  provider: 
+
+ 
+
+
+  flutter_datetime_picker_plus: ^2.1.0
+  image_picker: ^0.8.4+2
+  intl: 
+  qr_flutter: ^4.0.0
+  searchfield: 
+
+
+  shortid: ^0.1.2
+  font_awesome_flutter: 
+
+
+  cloud_functions: ^4.7.6
+  google_fonts:
+
+flutter:
+  uses-material-design: true
+  assets:
+
+   - assets/images/
+ 
