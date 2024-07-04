@@ -75,16 +75,16 @@ class _PdfViewPageState extends State<PdfViewPage> {
             ? const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
+                  CircularProgressIndicator( color:  Color(0xff2476BD)),
                   SizedBox(height: 20),
-                  Text('Loading PDF...'),
+                  Text('Loading PDF...', style: TextStyle(color:  Color(0xff2476BD),),),
                 ],
               )
             : _localPath != null
                 ? PDFView(
                     filePath: _localPath!,
                   )
-                : const Text('Error loading PDF'),
+                : const Text('No PDF Found', style: TextStyle(color:  Color(0xff2476BD),),),
       ),
     );
   }

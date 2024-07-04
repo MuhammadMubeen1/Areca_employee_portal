@@ -1,7 +1,10 @@
+import 'package:employe_portal/controllor/login_controllor.dart';
 import 'package:employe_portal/view/create_employee.dart';
 import 'package:employe_portal/view/home.dart';
+import 'package:employe_portal/view/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class aUsers extends StatefulWidget {
   const aUsers({Key? key}) : super(key: key);
@@ -13,6 +16,8 @@ class aUsers extends StatefulWidget {
 class _aUsersState extends State<aUsers> {
   late DateTime _selectedDate;
   bool _showAllUsers = true;
+  TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
 
   @override
   void initState() {
@@ -25,6 +30,24 @@ class _aUsersState extends State<aUsers> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(
+            Icons.logout,
+            color: Color(0xff2476BD),
+            size: 25,
+          ),
+          onPressed: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.clear(); // Clear all SharedPreferences
+
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => Login_Screen()),
+              (Route<dynamic> route) =>
+                  false, // Prevent going back to previous screen
+            );
+          },
+        ),
         backgroundColor: Colors.white,
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -58,30 +81,83 @@ class _aUsersState extends State<aUsers> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('All Employees')
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+          const SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              cursorColor:  Color(0xff2476BD),
+              controller: _searchController,
+              decoration: InputDecoration(
+                
 
-                var documents = snapshot.data!.docs;
-
-                if (_showAllUsers) {
-                  return _buildUserList(documents);
-                } else {
-                  // Filter documents based on the selected date
-                  var filteredDocuments = documents.where((document) {
-                    return document['date'].toString().substring(0, 10) ==
-                        _selectedDate.toIso8601String().substring(0, 10);
-                  }).toList();
-                  return _buildUserList(filteredDocuments);
-                }
+                contentPadding: const EdgeInsets.all(18),
+                hintText: 'Search by name or email',
+                hintStyle: const TextStyle(fontSize: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22.0),
+                  // Rounded corners
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22.0), // Rounded corners
+                  borderSide: const BorderSide(
+                    color: Color(0xff2476BD),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22.0), // Rounded corners
+                  borderSide: const BorderSide(
+                    color: Color(0xff2476BD), // Change the color as needed
+                  ),
+                ),
+                prefixIcon: const Icon(Icons.search),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value.toLowerCase();
+                });
               },
             ),
+          ),
+          StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('AllEmployees')
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              var documents = snapshot.data!.docs;
+
+              // Filter documents based on search query
+              var filteredDocuments = documents.where((document) {
+                var name = document['name'].toString().toLowerCase();
+                var email = document['email'].toString().toLowerCase();
+                return name.contains(_searchQuery) ||
+                    email.contains(_searchQuery);
+              }).toList();
+
+              return Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    
+                  const  SizedBox(height: 14,),
+                    Text(
+                      'Total Employees: ${filteredDocuments.length}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color:Color(0xff2476BD),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Expanded(child: _buildUserList(filteredDocuments)),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -99,23 +175,29 @@ class _aUsersState extends State<aUsers> {
               context,
               MaterialPageRoute(
                 builder: (context) => Home_Screen(
-                  image: document['imageUrl'],
-                  contactemail: document['emergencyContact']['email'],
-                  name: document['name'],
-                  currance: document['currency'],
-                  salary: document['salary'],
-                  phone: document['phone'],
-                  address: document['address'],
-                  nationality: document['nationality'],
-                  employer: document['employer'],
-                  desination: document['designation'],
-                  contactname: document['emergencyContact']['name'],
-                  contactphone: document['phone'],
-                  cotactemail: document['emergencyContact']['email'],
-                  viewcontract: document['contractDocumentUrl'],
-                  viewofferletter: document['offercontractUrl'],
-                  viewdocument: document['otherdoc'],
-                  cotactdesination: document['emergencyContact']['designation'],
+                  city: document['city'].toString(),
+                  password: document['password'].toString(),
+                  country: document['country'].toString(),
+                  image: document['imageUrl'].toString(),
+                  contactemail:
+                      document['emergencyContact']['companyemail'].toString(),
+                  name: document['name'].toString(),
+                  currance: document['currency'].toString(),
+                  salary: document['salary'].toString(),
+                  phone: document['phone'].toString(),
+                  address: document['address'].toString(),
+                  nationality: document['nationality'].toString(),
+                  employer: document['employer'].toString(),
+                  desination: document['designation'].toString(),
+                  contactname: document['emergencyContact']['name'].toString(),
+                  contactphone:
+                      document['emergencyContact']['phone'].toString(),
+                  viewcontract: document['contractDocumentUrl'].toString(),
+                  viewofferletter: document['offercontractUrl'].toString(),
+                  viewdocument: document['otherdoc'].toString(),
+                  cotactdesination:
+                      document['emergencyContact']['designation'].toString(),
+                  email: document['email'].toString(),
                 ),
               ),
             );
@@ -131,7 +213,7 @@ class _aUsersState extends State<aUsers> {
                           document['imageUrl']!.isNotEmpty)
                       ? NetworkImage(document['imageUrl'] as String)
                           as ImageProvider<Object>?
-                      : const AssetImage("assets/images/man2.png"),
+                      : const AssetImage("assets/images/ateca.png"),
                   radius: 25,
                 ),
                 title: Text(

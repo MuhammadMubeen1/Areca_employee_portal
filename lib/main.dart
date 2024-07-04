@@ -21,20 +21,37 @@ await Firebase.initializeApp(); // Initialize Firebase
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+ 
+  
+ @override
+
   Widget build(BuildContext context) {
     
     return  MaterialApp(
         debugShowCheckedModeBanner: false,
-      home: Login_Screen()
+      home: 
+      //ogin_Screen()
       // aUsers(),
-      //SplashScreen()
+      SplashScreen()
      // Login_Screen()
         
       
     );
   }
+  Future<String?> getCurrentUserEmail() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString('email');
 }
+
+  
+
+}
+

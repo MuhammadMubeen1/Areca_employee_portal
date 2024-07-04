@@ -1,7 +1,13 @@
-import 'package:employe_portal/view/login_screen.dart';
+import 'package:employe_portal/controllor/login_controllor.dart';
+import 'package:employe_portal/view/user/user_inof.dart';
+import 'package:employe_portal/view/users_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:employe_portal/view/login_screen.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
+   
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -28,12 +34,37 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => Login_Screen()),
-        );
+        _checkLoginStatus();
       }
     });
   }
+
+
+Future<void> _checkLoginStatus() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  bool isAdmin = prefs.getBool('isAdmin') ?? false;
+  String currentEmail = prefs.getString('email') ?? ''; // Fetch current email from SharedPreferences
+
+  if (isLoggedIn) {
+    if (isAdmin) {
+      // Navigate to admin screen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => aUsers()), // Replace with your admin screen
+      );
+    } else {
+      // Navigate to user info screen and pass current email
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => User_Info(currentEmail: currentEmail)),
+      );
+    }
+  } else {
+    // Navigate to login screen
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => Login_Screen()), // Replace with your login screen
+    );
+  }
+}
 
   @override
   void dispose() {
@@ -63,7 +94,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 width: 300,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/images/atecalogo.png'), // Make sure you add your logo image to assets
+                    image: AssetImage('assets/images/atecalogo.png'), // Replace with your logo image path
                     fit: BoxFit.contain,
                   ),
                 ),

@@ -5,13 +5,13 @@ class CustomTextFormField extends StatelessWidget {
   final String? labelText;
   final String? hintText;
   final String? helperText;
-  final  Widget? prefixIcon;
-  final  Widget? suffixIcon;
-
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final TextInputType? keyboardType;
   final bool obscureText;
   final Function(String)? onChanged;
   final FormFieldValidator<String>? validator;
+  final bool readOnly; // New property for read-only mode
 
   const CustomTextFormField({
     Key? key,
@@ -25,6 +25,7 @@ class CustomTextFormField extends StatelessWidget {
     this.obscureText = false,
     this.onChanged,
     this.validator,
+    this.readOnly = false, // Default value is false
   }) : super(key: key);
 
   @override
@@ -32,23 +33,27 @@ class CustomTextFormField extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 30),
       child: TextFormField(
-        
         cursorColor: Colors.grey,
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
         onChanged: onChanged,
         validator: validator,
+        readOnly: readOnly, // Set readOnly property
         decoration: InputDecoration(
           fillColor: Colors.white,
           filled: true,
           contentPadding: const EdgeInsets.all(20),
           labelText: labelText,
           hintText: hintText,
-          hintStyle: const  TextStyle(color: Color(0xff999CAD), fontWeight: FontWeight.w400, fontSize: 14),
+          hintStyle: const TextStyle(
+            color: Color(0xff999CAD),
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+          ),
           helperText: helperText,
           prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon ,
+          suffixIcon: suffixIcon,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(18.0),
           ),

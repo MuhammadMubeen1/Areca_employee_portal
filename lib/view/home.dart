@@ -1,8 +1,10 @@
+
 import 'dart:ui';
 
 import 'package:employe_portal/view/contract_employee.dart';
 import 'package:employe_portal/view/create_employee.dart';
 import 'package:employe_portal/view/pdfviewer.dart';
+import 'package:employe_portal/view/update_user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,23 +16,26 @@ import 'package:url_launcher/url_launcher.dart';
 class Home_Screen extends StatefulWidget {
 
   
-  String name, phone ,address, salary, contactemail, image, nationality, currance, employer, desination, contactname, contactphone, cotactemail, cotactdesination, viewcontract,viewofferletter, viewdocument;
+  String name, phone , country,address, password, city, salary, contactemail, image, nationality, currance, employer, desination, contactname, contactphone, email, cotactdesination, viewcontract,viewofferletter, viewdocument;
   Home_Screen({
     Key? key,
     required this.name,
     required this.phone,
+    required this.country,
+    required this.password,
     required this.address,
+    required this.city,
     required this.image,
     required this.currance,
     required this.cotactdesination,
     required this.salary,
     required this.nationality,
-    required this.contactemail,
+    required this.email,
     required this.employer,
     required this.desination,
     required this.contactname,
     required this.contactphone,
-    required this.cotactemail,
+    required this.contactemail,
     required this.viewcontract,
     required this.viewofferletter,
     required this.viewdocument,
@@ -49,6 +54,10 @@ void _launchPhoneDialer(String phoneNumber) async {
 class _Home_ScreenState extends State<Home_Screen> {
   @override
   Widget build(BuildContext context) {
+
+      print('viewcontract: ${widget.viewcontract}');
+  print('viewofferletter: ${widget.viewofferletter}');
+  print('viewdocument: ${widget.viewdocument}');
     return Scaffold(
       appBar: AppBar(
         iconTheme: const  IconThemeData(color: Color(0xff2476BD),size: 25),
@@ -64,7 +73,26 @@ class _Home_ScreenState extends State<Home_Screen> {
                  Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const Create_Employee(
+                builder: (context) => Update_Employee(
+                  name: widget.name.toString(),
+                 contractemail: widget.contactemail.toString(),
+                  contractname:widget.contactname.toString(),
+                   contrdesination:widget.cotactdesination.toString(), 
+                   contractphone:widget.contactphone.toString(), salary: widget.salary.toString(), 
+                   currency: widget.currance.toString(),
+                    employer: widget.employer.toString(),
+                     country: widget.country.toString(), image: widget.image,
+                      phone: widget.phone.toString(), 
+                      address: widget.address.toString(), 
+                      password: widget.password.toString(),
+                       city:widget.city.toString(), 
+                       
+                      nationality: widget.nationality.toString(),
+                       email: widget.email.toString(), 
+                       desination: widget.desination.toString(), 
+                       selectcontractdocument: widget.viewcontract.toString(), 
+                       offerlatter: widget.viewofferletter.toString(), 
+                       oterdocument: widget.viewdocument.toString(),
 
                 
                 ),
@@ -88,16 +116,16 @@ class _Home_ScreenState extends State<Home_Screen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-             Center(
-              child:CircleAvatar(
-                  backgroundImage: (widget.image  != null &&
-                          widget.image !.isNotEmpty)
-                      ? NetworkImage(widget.image as String)
-                          as ImageProvider<Object>?
-                      : const AssetImage("assets/images/man2.png"),
-                  radius: 70,
-                ),
-            ),
+           Center(
+        child: CircleAvatar(
+          backgroundImage: (widget.image != null && widget.image.isNotEmpty)
+              ? const AssetImage("assets/images/ateca.png") as ImageProvider:
+              NetworkImage(widget.image ),
+            
+          radius: 70,
+        ),
+      ),
+    
             const SizedBox(
               height: 30,
             ),
@@ -106,11 +134,7 @@ class _Home_ScreenState extends State<Home_Screen> {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(
-                      Icons.email_outlined,
-                      color: Colors.grey,
-                      size: 30,
-                    ),
+                    leading:  const Icon(Icons.person_2_outlined, color: Colors.grey),
                     title: Text(
                       "Name",
                       style: GoogleFonts.montserrat(
@@ -121,7 +145,8 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                     subtitle: Text(
-                     widget.name??'',
+                      widget.name?? 'Null Value',
+              
                       style: GoogleFonts.montserrat(
                         textStyle: TextStyle(
                             color: Colors.grey.shade400,
@@ -130,21 +155,49 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
+                 
+                  const Divider(
+                
                   ),
+                 ListTile(
+                    leading: const Icon(
+                      Icons.email_outlined,
+                      color: Colors.grey,
+                      size: 25,
+                    ),
+                    title: Text(
+                      "Email",
+                      style: GoogleFonts.montserrat(
+                        textStyle: const TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14),
+                      ),
+                    ),
+                    subtitle: Text(
+                      widget.email ?? 'Null Value',
+                      style: GoogleFonts.montserrat(
+                        textStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14),
+                      ),
+                    ),
+                  ),
+
+
                   const Divider(
                     color: Colors.grey,
-                  ),
-                  const SizedBox(
-                    height: 10,
                   ),
                   ListTile(
                     leading: const Icon(
                       Icons.phone,
                       color: Colors.grey,
-                      size: 30,
+                      size: 25,
                     ),
+
+
+                    
                     title: Text(
                       "Phone",
                       style: GoogleFonts.montserrat(
@@ -155,7 +208,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                     subtitle: Text(
-                      widget.phone??'',
+                      widget.phone ?? 'Null Value',
                       style: GoogleFonts.montserrat(
                         textStyle: TextStyle(
                             color: Colors.grey.shade400,
@@ -164,23 +217,18 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                
+                 
                   const Divider(
-                    color: Colors.grey,
+                   
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+               
+              
                   ListTile(
                     leading: const Icon(
                       Icons.location_on_outlined,
                       color: Colors.grey,
-                      size: 30,
+                      size: 25,
                     ),
                     title: Text(
                       "Address",
@@ -192,7 +240,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                     subtitle: Text(
-                     widget.address??'',
+                     widget.address ?? 'Null Value',
                       style: GoogleFonts.montserrat(
                         textStyle: TextStyle(
                             color: Colors.grey.shade400,
@@ -201,18 +249,66 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
+                  Divider(),
+                 ListTile(
+                    leading: const Icon(
+                      Icons.location_city,
+                      color: Colors.grey,
+                      size: 25,
+                    ),
+                    title: Text(
+                      "City",
+                      style: GoogleFonts.montserrat(
+                        textStyle: const TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14),
+                      ),
+                    ),
+                    subtitle: Text(
+                     widget.city ?? 'Null Value',
+                      style: GoogleFonts.montserrat(
+                        textStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14),
+                      ),
+                    ),
                   ),
                   const Divider(
-                    color: Colors.grey,
+                 
                   ),
-                  const SizedBox(
-                    height: 10,
+                ListTile(
+                    leading: const FaIcon(
+                      FontAwesomeIcons.globe,
+                      color: Colors.grey,
+                      size: 20.0,
+                    ),
+                    title: Text(
+                      "Country",
+                      style: GoogleFonts.montserrat(
+                        textStyle: const TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14),
+                      ),
+                    ),
+                    subtitle: Text(
+                    widget.country ?? 'Null Value',
+                      style: GoogleFonts.montserrat(
+                        textStyle: TextStyle(
+                            color: Colors.grey.shade400,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14),
+                      ),
+                    ),
+                  ),
+            const Divider(
+                 
                   ),
                   ListTile(
                     leading: const FaIcon(
-                      FontAwesomeIcons.globe,
+                      FontAwesomeIcons.flag,
                       color: Colors.grey,
                       size: 20.0,
                     ),
@@ -226,7 +322,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                     subtitle: Text(
-                      widget.nationality??'',
+                    widget.nationality ?? 'Null Value',
                       style: GoogleFonts.montserrat(
                         textStyle: TextStyle(
                             color: Colors.grey.shade400,
@@ -235,18 +331,11 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
+                 
+                  const Divider(
+                  
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Divider(
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  
                   ListTile(
                     leading: const Icon(
                       Icons.work,
@@ -262,7 +351,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                     subtitle: Text(
-                      widget.employer??"",
+                   widget.employer ?? 'Null Value',
                       style: GoogleFonts.montserrat(
                         textStyle: TextStyle(
                             color: Colors.grey.shade400,
@@ -271,18 +360,11 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
+                
+                  Divider(
+                    color: Colors.grey.shade500,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Divider(
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                 
                   ListTile(
                     leading: const Icon(
                       Icons.person_2,
@@ -298,7 +380,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                     subtitle: Text(
-                   widget.desination,
+                  widget.desination ?? 'Null Value',
                       style: GoogleFonts.montserrat(
                         textStyle: TextStyle(
                             color: Colors.grey.shade400,
@@ -307,18 +389,11 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
+                
+                  Divider(
+                    color: Colors.grey.shade500,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Divider(
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  
                   ListTile(
                     leading: const Icon(
                       Icons.payment_outlined,
@@ -334,10 +409,12 @@ class _Home_ScreenState extends State<Home_Screen> {
                       ),
                     ),
                     subtitle: Text(
-      "${widget.salary} ${widget.currance}",
+                   
+ "${widget.salary ?? 'Salary not provided'} ${widget.currance ?? ''}",
+
                       style: GoogleFonts.montserrat(
                         textStyle: TextStyle(
-                            color: Colors.grey.shade400,
+                           color: Colors.grey.shade400,
                             fontWeight: FontWeight.w400,
                             fontSize: 14),
                       ),
@@ -352,12 +429,10 @@ class _Home_ScreenState extends State<Home_Screen> {
                 color: Colors.grey.shade500,
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+           
             Container(
               height: 200,
-              width: 320,
+              width: 340,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
@@ -391,13 +466,14 @@ class _Home_ScreenState extends State<Home_Screen> {
                           ),
                         ),
                         const SizedBox(
-                          width: 30,
+                          width: 10,
                         ),
                         GestureDetector(
                            onTap: () {
-  launchEmail();
-        
-          },
+
+                            launchEmail();
+
+                              },
                           child: Container(
                             height: 35,
                             width: 35,
@@ -431,7 +507,23 @@ class _Home_ScreenState extends State<Home_Screen> {
                             ),
                           ),
                         ),
-                      ],
+                     
+                      SizedBox(width: 10,),
+                             GestureDetector(
+  onTap: () {
+    _launchWhatsApp(widget.contactphone); // Call the function to launch WhatsApp
+  },
+  child: Container(
+    height: 35,
+    width: 35,
+    decoration: BoxDecoration(
+      color: const Color(0xff2476BD),
+      borderRadius: BorderRadius.circular(18),
+    ),
+    child: Image.asset("assets/images/whatsapp2.png"),
+  ),
+),
+                     ],
                     ),
                   ),
                   Padding(
@@ -440,6 +532,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
+                          
                           widget.contactname??'',
                           style: GoogleFonts.montserrat(
                             textStyle: const TextStyle(
@@ -448,9 +541,9 @@ class _Home_ScreenState extends State<Home_Screen> {
                                 fontSize: 14),
                           ),
                         ),
-                        SizedBox(height: 8,),
+                       const SizedBox(height: 8,),
                         Text(
-                   widget.cotactdesination??'',
+                   widget.cotactdesination??'null value',
                           style: GoogleFonts.montserrat(
                             textStyle: const TextStyle(
                                 color: Color(0xff787878),
@@ -462,7 +555,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                           height: 8,
                         ),
                         Text(
-                         widget.phone??'',
+                         widget.contactphone??'null value',
                           style: GoogleFonts.montserrat(
                             textStyle: const TextStyle(
                                color: Color(0xff787878),
@@ -474,7 +567,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                           height: 8,
                         ),
                         Text(
-                         widget.contactemail,
+                         widget. contactemail??'null valuea',
                           style: GoogleFonts.montserrat(
                             textStyle: const TextStyle(
                                color: Color(0xff787878),
@@ -493,114 +586,111 @@ class _Home_ScreenState extends State<Home_Screen> {
             const SizedBox(
               height: 20,
             ),
-
-           GestureDetector(
-  onTap: () {
-    // Navigate to PDF viewer screen and pass the PDF path
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PdfViewPage(initialPdfUrl: widget.viewcontract),
-      ),
-    );
-  },
-  child: Container(
-    decoration: BoxDecoration(
-      color: const Color(0xff2476BD),
-      borderRadius: BorderRadius.circular(35),
-    ),
-    width: 242,
-    height: 57,
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(width: 20),
-        Center(
-          child: Text(
-            'View Contract',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+Column(
+    children: [
+      if (widget.viewcontract != null && widget.viewcontract.isNotEmpty) ...[
+        GestureDetector(
+          onTap: () {
+            // Navigate to PDF viewer screen and pass the PDF path
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PdfViewPage(initialPdfUrl: widget.viewcontract),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xff2476BD),
+              borderRadius: BorderRadius.circular(35),
+            ),
+            width: 242,
+            height: 57,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 20),
+                Center(
+                  child: Text(
+                    'View Contract',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+      if (widget.viewofferletter != null && widget.viewofferletter.isNotEmpty) ...[
+        GestureDetector(
+          onTap: () {
+            // Navigate to PDF viewer screen and pass the PDF path
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PdfViewPage(initialPdfUrl: widget.viewofferletter),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xff2FDAE4),
+              borderRadius: BorderRadius.circular(35),
+            ),
+            width: 242,
+            height: 57,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 20), // Adjust the space between the icon and the next widget
+                Center(
+                  child: Text(
+                    'View Offer Letter',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+      if (widget.viewdocument != null && widget.viewdocument.isNotEmpty) ...[
+        GestureDetector(
+          onTap: () {
+            // Navigate to PDF viewer screen and pass the PDF path
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PdfViewPage(initialPdfUrl: widget.viewdocument),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xffC2C2C2),
+              borderRadius: BorderRadius.circular(35),
+            ),
+            width: 242,
+            height: 57,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 20), // Adjust the space between the icon and the next widget
+                Center(
+                  child: Text(
+                    'View Document',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],
-    ),
+    ],
   ),
-),
-SizedBox(height: 10,),
-
-  GestureDetector(
-   onTap: () {
-    // Navigate to PDF viewer screen and pass the PDF path
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PdfViewPage(initialPdfUrl: widget.viewofferletter),
-      ),
-    );
-  }, 
-   child: Container(
-    decoration: BoxDecoration(
-      color: const Color(0xff2FDAE4),
-      borderRadius: BorderRadius.circular(35),
-    ),
-    width: 242,
-    height: 57,
-    child: const  Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-       
-        
-        SizedBox(width: 20), // Adjust the space between the icon and the next widget
-        // Add other widgets here
-        Center(
-          child: Text(
-            'View Offer Letter',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, ),
-            
-          ),
-        ),
-   
-   
-     
-      ],
-    ),
-   ),
- ),
- const   SizedBox(height: 10,),
-           GestureDetector(
-            onTap: () {
-    // Navigate to PDF viewer screen and pass the PDF path
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PdfViewPage(initialPdfUrl: widget.viewdocument),
-      ),
-    );
-  }, 
-             child: Container(
-               decoration: BoxDecoration(
-                 color: const Color(0xffC2C2C2),
-                 borderRadius: BorderRadius.circular(35),
-               ),
-               width: 242,
-               height: 57,
-               child: const  Row(
-                 mainAxisAlignment: MainAxisAlignment.center,
-                 children: [
-                 
-                   SizedBox(width: 20), // Adjust the space between the icon and the next widget
-                   // Add other widgets here
-                   Center(
-                     child: Text(
-                       ' View document',
-                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, ),
-                       
-                     ),
-                   ),
-                 ],
-               ),
-             ),
-           ),
-
            const SizedBox(height: 50,
            )
           ],
@@ -621,6 +711,17 @@ dynamic launchEmail() async {
   }
   catch(e) {
     debugPrint(e.toString());
+  }
+}
+
+  void _launchWhatsApp(String phoneNumber) async {
+  String message = 'Hello!'; // Your message here
+  String url = 'https://wa.me/$phoneNumber/?text=${Uri.parse(message)}';
+
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch WhatsApp';
   }
 }
 }
