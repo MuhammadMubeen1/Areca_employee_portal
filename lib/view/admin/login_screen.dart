@@ -1,12 +1,15 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:employe_portal/view/admin/users_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:employe_portal/view/create_employee.dart';
+
 import 'package:employe_portal/view/user/user_inof.dart';
-import 'package:employe_portal/view/users_screen.dart';
+
 import 'package:employe_portal/widget/custom_button.dart';
 import 'package:employe_portal/widget/custom_textformfield.dart';
 
@@ -132,7 +135,7 @@ class _Login_ScreenState extends State<Login_Screen> {
                 String email = emailController.text.trim();
                 if (email.isNotEmpty) {
                   QuerySnapshot userSnapshot = await FirebaseFirestore.instance
-                      .collection('admin')
+                      .collection('AllEmployees')
                       .where('email', isEqualTo: email)
                       .get();
 
@@ -152,13 +155,13 @@ class _Login_ScreenState extends State<Login_Screen> {
                   }
                 }
               },
-              child: Text('Verify Email', style: TextStyle(color: Color(0xff2476BD)),),
+              child:const  Text('Verify Email', style: TextStyle(color: Color(0xff2476BD)),),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Cancel', style: TextStyle(color: Color(0xff2476BD)),),
+              child: const Text('Cancel', style: TextStyle(color: Color(0xff2476BD)),),
             ),
           ],
         );
@@ -272,13 +275,13 @@ class _Login_ScreenState extends State<Login_Screen> {
               CustomTextFormField(
                 prefixIcon: const Icon(
                   Icons.email_outlined,
-                  color: Colors.grey,
+                  color: Color(0xff2476BD)
                 ),
                 hintText: 'Email',
                 controller: _emailController,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'This field is required';
+                    return 'Email Should not be empty';
                   }
                   return null; // Return null if the input is valid
                 },
@@ -300,7 +303,7 @@ class _Login_ScreenState extends State<Login_Screen> {
                      suffixIcon: IconButton(
                        icon: Icon(
                          _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                         color: Colors.grey,
+                         color: Color(0xff2476BD),
                       
                        ),
                        onPressed: () {
@@ -311,7 +314,7 @@ class _Login_ScreenState extends State<Login_Screen> {
                      ),
                      prefixIcon: const Icon(
                        Icons.password_outlined,
-                        color: Colors.grey,
+                        color: Color(0xff2476BD),
                      ),
                      border: OutlineInputBorder(
                        

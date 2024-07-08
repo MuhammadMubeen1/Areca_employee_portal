@@ -1,7 +1,7 @@
 import 'package:employe_portal/controllor/login_controllor.dart';
-import 'package:employe_portal/view/create_employee.dart';
-import 'package:employe_portal/view/home.dart';
-import 'package:employe_portal/view/login_screen.dart';
+import 'package:employe_portal/view/admin/create_employee.dart';
+import 'package:employe_portal/view/admin/home.dart';
+import 'package:employe_portal/view/admin/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,24 +30,52 @@ class _aUsersState extends State<aUsers> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.logout,
-            color: Color(0xff2476BD),
-            size: 25,
-          ),
-          onPressed: () async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.clear(); // Clear all SharedPreferences
+       leading: IconButton(
+  icon: const Icon(
+    Icons.logout,
+    color: Color(0xff2476BD),
+    size: 25,
+  ),
+  onPressed: () async {
+    // Show a confirmation dialog
+    bool confirmLogout = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout', style: TextStyle(color:  Color(0xff2476BD, ), fontWeight: FontWeight.bold),),
+          content: const Text('Are you sure you want to logout?', style: TextStyle(color:  Colors.black, fontWeight: FontWeight.bold)),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel', style: TextStyle(color:  Color(0xff2476BD),  fontWeight: FontWeight.bold), ),
+              onPressed: () {
+                Navigator.of(context).pop(false); // Return false when cancel is pressed
+              },
+            ),
+            TextButton(
+              child: const  Text('Logout',style: TextStyle(color:  Color(0xff2476BD),  fontWeight: FontWeight.bold),),
+              onPressed: () {
+                Navigator.of(context).pop(true); // Return true when logout is confirmed
+              },
+            ),
+          ],
+        );
+      },
+    );
 
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => Login_Screen()),
-              (Route<dynamic> route) =>
-                  false, // Prevent going back to previous screen
-            );
-          },
-        ),
+    // If user confirms logout, clear SharedPreferences and navigate to login screen
+    if (confirmLogout ?? false) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.clear(); // Clear all SharedPreferences
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => Login_Screen()),
+        (Route<dynamic> route) => false, // Prevent going back to previous screen
+      );
+    }
+  },
+),
+
         backgroundColor: Colors.white,
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -93,10 +121,11 @@ class _aUsersState extends State<aUsers> {
                 
 
                 contentPadding: const EdgeInsets.all(18),
-                hintText: 'Search by name or email',
-                hintStyle: const TextStyle(fontSize: 14),
+                hintText: 'Search by name or email.',
+                
+                hintStyle: const TextStyle(fontSize: 14, color:  Colors.grey),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22.0),
+                  borderRadius: BorderRadius.circular(22.0)
                   // Rounded corners
                 ),
                 enabledBorder: OutlineInputBorder(
@@ -111,7 +140,7 @@ class _aUsersState extends State<aUsers> {
                     color: Color(0xff2476BD), // Change the color as needed
                   ),
                 ),
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search, color: Color(0xff2476BD),),
               ),
               onChanged: (value) {
                 setState(() {

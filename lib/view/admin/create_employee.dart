@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:employe_portal/view/users_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:country_picker/country_picker.dart';
@@ -12,57 +11,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:date_format/date_format.dart';
+import 'package:uuid/uuid.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
-
-class Update_Employee extends StatefulWidget {
-
-String name, email, 
-image, password,
- phone, address, 
- city, country, 
- nationality, desination, 
- employer, selectcontractdocument, 
- offerlatter, oterdocument, 
- salary, currency, 
- contractname, contractemail, 
- contractphone,contrdesination; 
-Update_Employee({
-    Key? key,
-    required this.name,
-    required this.contractemail,
-    required this.contractname,
-    required this.contrdesination,
-    required this.contractphone,
-    required this.salary,
-    required this.currency,
-    required this.employer,
-    required this.country,
-    required this.image,
-    required this.phone,
-    required this.address,
-    required this.password,
-    required this.city,
-   
-    required this.nationality,
-    required this.email,
-
-    required this.desination,
-  
-    required this.selectcontractdocument,
-    required this.offerlatter,
-    required this.oterdocument,
-  }) : super(key: key);
+import 'package:shortid/shortid.dart';
+import 'package:mailer/mailer.dart' as mailer;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
+import 'package:mailer/smtp_server/gmail.dart';
 
 
 
+ 
+
+class Create_Employee extends StatefulWidget {
+  const Create_Employee({super.key});
 
   @override
-  State<Update_Employee> createState() => _Create_EmployeeState();
+  State<Create_Employee> createState() => _Create_EmployeeState();
 }
 
-class _Create_EmployeeState extends State<Update_Employee> {
+class _Create_EmployeeState extends State<Create_Employee> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -77,8 +49,10 @@ class _Create_EmployeeState extends State<Update_Employee> {
   final TextEditingController contactNameController = TextEditingController();
   final TextEditingController contactEmailController = TextEditingController();
     final TextEditingController passwordController= TextEditingController();
-  final TextEditingController contactDesignationController = TextEditingController();
-  final TextEditingController contacttextEditingController =  TextEditingController();
+  final TextEditingController contactDesignationController =
+      TextEditingController();
+  final TextEditingController contacttextEditingController =
+      TextEditingController();
   final TextEditingController OfferLatterController = TextEditingController();
   final TextEditingController otherLatterController = TextEditingController();
 
@@ -116,29 +90,6 @@ class _Create_EmployeeState extends State<Update_Employee> {
       });
     }
   }
-   void initState(){
-  super.initState();
-   contactPhoneNumber=widget.contractphone;
-     nameController.text = widget.name;
-     phoneNumber=widget.phone;
-   emailController.text = widget.email;
-  addressController.text = widget.address;
-   countryController.text = widget.country;
-nationalityController.text = widget.nationality;
-   designationController.text = widget.desination;
-     city_controllor.text = widget.city;
-  employerController.text = widget.employer;
-   salaryController.text = widget.salary;
-   currencyController.text = widget.currency;
-   contactNameController.text = widget.contractname;
-   contactEmailController.text = widget.contractemail;
-   passwordController.text= widget.password;
-   contactDesignationController.text = widget.contrdesination;
-  contacttextEditingController.text =  widget.selectcontractdocument;
-   OfferLatterController.text = widget.offerlatter;
-   otherLatterController.text = widget.oterdocument;
-  }
-
 
   Future<String?> _uploadImage() async {
     if (_image == null) return null;
@@ -245,16 +196,16 @@ nationalityController.text = widget.nationality;
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ListTile(
-                            leading: Icon(Icons.camera, color: Color(0xff2476BD),),
-                            title: Text('Camera'),
+                            leading: const Icon(Icons.camera, color: Color(0xff2476BD),),
+                            title: const Text('Camera'),
                             onTap: () {
                               Navigator.pop(context);
                               _pickImage(ImageSource.camera);
                             },
                           ),
                           ListTile(
-                            leading: Icon(Icons.photo_album, color: Color(0xff2476BD),),
-                            title: Text('Gallery',),
+                            leading:const Icon(Icons.photo_album, color: Color(0xff2476BD),),
+                            title: const Text('Gallery',),
                             onTap: () {
                               Navigator.pop(context);
                               _pickImage(ImageSource.gallery);
@@ -271,8 +222,7 @@ nationalityController.text = widget.nationality;
                       backgroundImage: _image != null
                           ? FileImage(_image!)
                           :const  AssetImage("assets/images/ateca.png")
-                              as ImageProvider,
-                      radius: 70,
+                              as ImageProvider,                      radius: 70,
                     ),
                     const Positioned(
                       bottom: 0,
@@ -301,17 +251,18 @@ nationalityController.text = widget.nationality;
               ),
               const SizedBox(height: 10),
               CustomTextFormField(
-                readOnly: true,
                 prefixIcon:
                    Icon(Icons.email_outlined, color:  Colors.grey.shade300),
                 hintText: 'Email',
                 controller: emailController,
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'this field is required';
-                  }
-                  return null;
-                },
+    if (value == null || value.trim().isEmpty) {
+      return 'This field is required';
+    }
+    // Optionally, add more validation for email format
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value.trim())) {
+      return 'Please enter a valid email';
+    }}
               ),
               const SizedBox(height: 10),
 
@@ -375,7 +326,7 @@ Padding(
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: IntlPhoneField(
-               
+                  
                   decoration: InputDecoration(
                     fillColor: Colors.white,
                     filled: true,
@@ -409,12 +360,12 @@ Padding(
                       borderSide: BorderSide(color: Colors.grey.shade300),
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null) {
-                      return 'this field is required';
-                    }
-                    return null;
-                  },
+                 validator: (value) {
+                  if (value == null) {
+                    return 'Please select a address';
+                  }
+                  return null;
+                },
                   initialCountryCode: 'AE',
                   onChanged: (phone) {
                     setState(() {
@@ -436,7 +387,7 @@ Padding(
                   return null;
                 },
               ),
-SizedBox(height: 20,),
+const SizedBox(height: 20,),
  CustomTextFormField(
                 hintText: 'City',
                 prefixIcon:
@@ -517,7 +468,7 @@ SizedBox(height: 20,),
                             fontSize: 14,
                           ),
                         ),
-                        suffixIcon: Icon(Icons.attach_file),
+                        suffixIcon:const  Icon(Icons.attach_file),
                         // Default border style
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20.0),
@@ -532,8 +483,8 @@ SizedBox(height: 20,),
                         ),
                         // Focused border style
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                          borderSide: BorderSide(
+                          borderRadius: BorderRadius.circular(20.0),  
+                                                  borderSide: BorderSide(
                             color:
                                 Colors.grey.shade300, // Adjust color as needed
                             // Adjust width as needed
@@ -556,96 +507,109 @@ SizedBox(height: 20,),
                           ),
                         ),
                       ),
-                      onTap: () async {
-                        // Open file picker
-                        FilePickerResult? result =
-                            await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['pdf',],
-                        );
-                        if (result != null) {
-                          pickedFile = result.files.first;
-                          setState(() {
-                            contacttextEditingController.text =
-                                pickedFile!.name;
-                          });
-                        }
+                        onTap: () async {
+            // Open file picker
+            FilePickerResult? result = await FilePicker.platform.pickFiles(
+              type: FileType.custom,
+              allowedExtensions: ['pdf'],
+            );
+            if (result != null) {
+              pickedFile = result.files.first;
+              // Check file size (size is in bytes, 1024 bytes = 1 KB, 1024 * 1024 bytes = 1 MB)
+             if (pickedFile!.size <= 500 * 1024) { // 100 KB limit
+                setState(() {
+            contacttextEditingController.text = pickedFile!.name;
+                });
+              } else {
+                // Show error if file size exceeds the limit
+                ScaffoldMessenger.of(context).showSnackBar(
+                 const  SnackBar(
+                  backgroundColor: Color(0xff2476BD),
+                    content: Text('File size should be less than 500 KB, Please compress before upload.'),
+                  ),
+                );
+              }
+            }
+          
                       }),
                 ),
               ),
              const SizedBox(
                 height: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Center(
-                  child: TextFormField(
-                      readOnly: true,
-                      controller: OfferLatterController,
-                      decoration: InputDecoration(
-                        hintText: ' Upload Offer Latter ',
-                        hintStyle: GoogleFonts.montserrat(
-                          textStyle: const TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                          ),
-                        ),
-                        suffixIcon: Icon(Icons.attach_file),
-                        // Default border style
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade300,
-                            // Adjust width as needed
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(18.0),
-                        ),
-                        // Focused border style
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                          borderSide: BorderSide(
-                            color:
-                                Colors.grey.shade300, // Adjust color as needed
-                            // Adjust width as needed
-                          ),
-                        ),
-                        // Error border style
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                          borderSide: const BorderSide(
-                            color: Colors.red, // Adjust color as needed
-                            width: 2.0, // Adjust width as needed
-                          ),
-                        ),
-                        // Border style when disabled
-                        disabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                          borderSide: BorderSide(
-                            color: Colors.grey.shade300,
-                            // Adjust width as needed
-                          ),
-                        ),
-                      ),
-                      onTap: () async {
-                        // Open file picker
-                        FilePickerResult? result =
-                            await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: [ 'pdf', ],
-                        );
-                        if (result != null) {
-                          pickedFile2 = result.files.first;
-                          setState(() {
-                            OfferLatterController.text = pickedFile2!.name;
-                          });
-                        }
-                      }),
-                ),
+          Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25),
+      child: Center(
+        child: TextFormField(
+          readOnly: true,
+          controller: OfferLatterController,
+          decoration: InputDecoration(
+            hintText: ' Upload Offer Letter ',
+            hintStyle: GoogleFonts.montserrat(
+              textStyle: const TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
               ),
+            ),
+            suffixIcon: Icon(Icons.attach_file),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),
+              borderSide: BorderSide(
+                color: Colors.grey.shade300,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(18.0),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),
+              borderSide: BorderSide(
+                color: Colors.grey.shade300,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),
+              borderSide: const BorderSide(
+                color: Colors.red,
+                width: 2.0,
+              ),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20.0),
+              borderSide: BorderSide(
+                color: Colors.grey.shade300,
+              ),
+            ),
+          ),
+          onTap: () async {
+            // Open file picker
+            FilePickerResult? result = await FilePicker.platform.pickFiles(
+              type: FileType.custom,
+              allowedExtensions: ['pdf'],
+            );
+            if (result != null) {
+              pickedFile2 = result.files.first;
+              // Check file size (size is in bytes, 1024 bytes = 1 KB, 1024 * 1024 bytes = 1 MB)
+             if (pickedFile2!.size <= 500 * 1024) { // 100 KB limit
+                setState(() {
+                OfferLatterController.text = pickedFile2!.name;
+                });
+              } else {
+                // Show error if file size exceeds the limit
+                ScaffoldMessenger.of(context).showSnackBar(
+                 const  SnackBar(
+                   backgroundColor: Color(0xff2476BD),
+                    content: Text('File size should be less than 500 KB, Please compress the file before upload.'),
+                  ),
+                );
+              }
+            }
+          },
+        ),
+      ),
+    ),
               const SizedBox(height: 15),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -701,20 +665,29 @@ SizedBox(height: 20,),
                           ),
                         ),
                       ),
-                      onTap: () async {
-                        // Open file picker
-                        FilePickerResult? result =
-                            await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['pdf'],
-                        );
-                        if (result != null) {
-                          pickedFile3 = result.files.first;
-                          setState(() {
-                            otherLatterController.text = pickedFile3!.name;
-                          });
-                        }
-                      }),
+                    onTap: () async {
+            // Open file picker
+            FilePickerResult? result = await FilePicker.platform.pickFiles(
+              type: FileType.custom,
+              allowedExtensions: ['pdf'],
+            );
+            if (result != null) {
+              pickedFile3 = result.files.first;
+              // Check file size (size is in bytes, 1024 bytes = 1 KB, 1024 * 1024 bytes = 1 MB)
+             if (pickedFile3!.size <= 500 * 1024) { // 100 KB limit
+                setState(() {
+          otherLatterController.text = pickedFile3!.name;
+                });
+              } else {
+                // Show error if file size exceeds the limit
+                ScaffoldMessenger.of(context).showSnackBar(
+                 const  SnackBar(
+                   backgroundColor: Color(0xff2476BD),
+                    content: Text('File size should be less than 500 KB, Please compress file before select.'),
+                  ),
+                );
+              }
+            }})
                 ),
               ),
             const   SizedBox(
@@ -916,70 +889,84 @@ SizedBox(height: 20,),
                 controller: contactDesignationController,
               ),
               const SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Container(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xff2476BD),
-                      textStyle: const TextStyle(fontSize: 18),
-                      minimumSize: const Size.fromHeight(55),
+        Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+  child: Container(
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Color(0xff2476BD),
+        textStyle: const TextStyle(fontSize: 18),
+        minimumSize: const Size.fromHeight(55),
+      ),
+      onPressed: isLoading
+          ? null // Disable button if loading
+          : () async {
+              if (_image == null) {
+                Fluttertoast.showToast(
+                  msg: "Please select an image.",
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.TOP,
+                  backgroundColor: Color(0xff2476BD),
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+                return; // Stop execution if no image is selected
+              }
+
+              if (_formKey.currentState!.validate()) {
+                setState(() {
+                  isLoading = true; // Set isLoading to true immediately
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    backgroundColor: Color(0xff2476BD),
+                    content: Text(
+                      'Please wait...',
+                      style: TextStyle(color: Colors.white),
                     ),
-                    onPressed: isLoading
-                        ? null // Disable button if loading
-                        : () async {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                isLoading =
-                                    true; // Set isLoading to true immediately
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  backgroundColor: Color(0xff2476BD),
-                                  content: Text(
-                                    'Please wait...',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              );
-                              await _updateEmployee();
-                              setState(() {
-                                isLoading =
-                                    false; // Set isLoading to false after completion
-                              });
-                            }
-                          },
-                    child: isLoading
-                        ? const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(
-                                color: Color(0xff2476BD),
-                              ),
-                              SizedBox(
-                                width: 24,
-                              ),
-                              Text(
-                                "Please Wait...",
-                                style: TextStyle(
-                                  color: Color(0xff2476BD),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          )
-                        : const Text(
-                            "Update Employee",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                  ),
+                );
+
+                await _createEmployee();
+
+                setState(() {
+                  isLoading = false; // Set isLoading to false after completion
+                });
+              }
+            },
+      child: isLoading
+          ? const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: Color(0xff2476BD),
+                ),
+                SizedBox(
+                  width: 24,
+                ),
+                Text(
+                  "Please Wait...",
+                  style: TextStyle(
+                    color: Color(0xff2476BD),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
+              ],
+            )
+          : const Text(
+              "Create Employee",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
+            ),
+    ),
+  ),
+),
+
               const SizedBox(
                 height: 30,
               )
@@ -989,136 +976,102 @@ SizedBox(height: 20,),
       ),
     );
   }
-Future<void> _updateEmployee() async {
-  // Upload images and files concurrently
-  final List<Future<String?>> uploadFutures = [
-    _uploadImage(),
-    if (pickedFile != null) _uploadFile(pickedFile!),
-    _uploadImage2(),
-    if (pickedFile2 != null) _uploadFile(pickedFile2!),
-    _uploadImage3(),
-    if (pickedFile3 != null) _uploadFile(pickedFile3!),
-  ];
 
-  // Wait for all uploads to complete
-  final List<String?> uploadResults = await Future.wait(uploadFutures);
+Future<void> _createEmployee() async {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Initialize indices
-  int currentIndex = 0;
-
-  // Extract results
-  final String? imageUrl = uploadResults[currentIndex++];
-  final String? fileUrl = (pickedFile != null) ? uploadResults[currentIndex++] : null;
-  final String? imageUrl2 = uploadResults[currentIndex++];
-  final String? fileUrl2 = (pickedFile2 != null) ? uploadResults[currentIndex++] : null;
-  final String? imageUrl3 = uploadResults[currentIndex++];
-  final String? fileUrl3 = (pickedFile3 != null) ? uploadResults[currentIndex++] : null;
-
-  // Query Firestore to get the document ID for the current user's email
-  final querySnapshot = await FirebaseFirestore.instance
-      .collection('AllEmployees')
-      .where('email', isEqualTo: emailController.text)
-      .get();
-
-  if (querySnapshot.docs.isNotEmpty) {
-    final docId = querySnapshot.docs.first.id;
-
-    // Create a map to hold the updates
-    Map<String, dynamic> updates = {};
-
-    if (nameController.text.isNotEmpty) {
-      updates['name'] = nameController.text;
-    }
-    if (emailController.text.isNotEmpty) {
-      updates['email'] = emailController.text;
-    }
-    updates['date'] = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    if (city_controllor.text.isNotEmpty) {
-      updates['city'] = city_controllor.text;
-    }
-    if (imageUrl != null) {
-      updates['imageUrl'] = imageUrl;
-    }
-    if (fileUrl != null) {
-      updates['contractDocumentUrl'] = fileUrl;
-    }
-    if (imageUrl2 != null) {
-      updates['imageUrl2'] = imageUrl2;
-    }
-    if (fileUrl2 != null) {
-      updates['offercontractUrl'] = fileUrl2;
-    }
-    if (imageUrl3 != null) {
-      updates['imageUrl3'] = imageUrl3;
-    }
-    if (fileUrl3 != null) {
-      updates['otherdoc'] = fileUrl3;
-    }
-    if (passwordController.text.isNotEmpty) {
-      updates['password'] = passwordController.text;
-    }
-    if (addressController.text.isNotEmpty) {
-      updates['address'] = addressController.text;
-    }
-    if (countryController.text.isNotEmpty) {
-      updates['country'] = countryController.text;
-    }
-    if (nationalityController.text.isNotEmpty) {
-      updates['nationality'] = nationalityController.text;
-    }
-    if (phoneNumber!=null) {
-      updates['phone'] = phoneNumber;
-    }
-    if (designationController.text.isNotEmpty) {
-      updates['designation'] = designationController.text;
-    }
-    if (employerController.text.isNotEmpty) {
-      updates['employer'] = employerController.text;
-    }
-    if (salaryController.text.isNotEmpty) {
-      updates['salary'] = salaryController.text;
-    }
-    if (currencyController.text.isNotEmpty) {
-      updates['currency'] = currencyController.text;
-    }
-    if (contactNameController.text.isNotEmpty ||
-        contactEmailController.text.isNotEmpty ||
-        (contactPhoneNumber != null && contactPhoneNumber!.isNotEmpty) ||
-        contactDesignationController.text.isNotEmpty) {
-      updates['emergencyContact'] = {
-        if (contactNameController.text.isNotEmpty) 'name': contactNameController.text,
-        if (contactEmailController.text.isNotEmpty) 'companyemail': contactEmailController.text,
-        if (contactPhoneNumber != null && contactPhoneNumber!.isNotEmpty) 'phone': contactPhoneNumber,
-        if (contactDesignationController.text.isNotEmpty) 'designation': contactDesignationController.text,
-      };
-    }
-
-    // Update the employee data in Firestore
-    await FirebaseFirestore.instance.collection('AllEmployees').doc(docId).update(updates);
-
-    // Clear the form fields
-    Navigator.pop(context);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Employee updated successfully!',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Color(0xff2476BD),
-      ),
+  try {
+    // Create user with email and password
+    UserCredential user = await _auth.createUserWithEmailAndPassword(
+      email: emailController.text,
+      password: passwordController.text,
     );
-     Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) =>  aUsers(), // Replace with your user screen
+
+    // Upload images and files concurrently
+    final List<Future<String?>> uploadFutures = [
+      _uploadImage(),
+      if (pickedFile != null) _uploadFile(pickedFile!),
+      _uploadImage2(),
+      if (pickedFile2 != null) _uploadFile(pickedFile2!),
+      _uploadImage3(),
+      if (pickedFile3 != null) _uploadFile(pickedFile3!),
+    ];
+
+    // Wait for all uploads to complete
+    final List<String?> uploadResults = await Future.wait(uploadFutures);
+
+    String? imageUrl = uploadResults.isNotEmpty ? uploadResults[0] : null;
+    String? fileUrl = pickedFile != null && uploadResults.length > 1 ? uploadResults[1] : null;
+    String? imageUrl2 = pickedFile != null && uploadResults.length > 2 ? uploadResults[2] : null;
+    String? fileUrl2 = pickedFile2 != null && uploadResults.length > 3 ? uploadResults[3] : null;
+    String? imageUrl3 = pickedFile2 != null && uploadResults.length > 4 ? uploadResults[4] : null;
+    String? fileUrl3 = pickedFile3 != null && uploadResults.length > 5 ? uploadResults[5] : null;
+
+    int id = DateTime.now().millisecondsSinceEpoch;
+    String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final String email = emailController.text.trim();
+
+    // Send confirmation email
+    bool emailSent = await sendEmail(email, nameController.text, id.toString(), passwordController.text);
+
+    // If email is sent successfully, add the employee data to Firestore
+    if (emailSent) {
+      await FirebaseFirestore.instance.collection('AllEmployees').add({
+        'name': nameController.text,
+        'email': emailController.text,
+        'date': currentDate,
+        'city': city_controllor.text,
+        'imageUrl': imageUrl,
+        'phone': phoneNumber, // Replace with your phone number variable
+        'contractDocumentUrl': fileUrl,
+        'offercontractUrl': fileUrl2,
+        'otherdoc': fileUrl3,
+        'password': passwordController.text,
+        'address': addressController.text,
+        'country': countryController.text,
+        'nationality': nationalityController.text,
+        'designation': designationController.text,
+        'employer': employerController.text,
+        'salary': salaryController.text,
+        'currency': currencyController.text,
+        'uid': id,
+        'emergencyContact': {
+          'name': contactNameController.text,
+          'companyemail': contactEmailController.text,
+          'phone': contactPhoneNumber, // Replace with your contact phone number variable
+          'designation': contactDesignationController.text,
+        },
+      });
+
+      // Clear the form fields and show success message
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Employee created and email sent successfully!',
+            style: TextStyle(color: Colors.white),
           ),
-        );
-  } else {
+          backgroundColor: Color(0xff2476BD),
+        ),
+      );
+    } else {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Employee creation failed as email sending failed. Please write correct email.',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (e) {
+    // Handle error (e.g., show error message)
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          'Employee not found!',
+          'Error: $e',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.red,
@@ -1127,24 +1080,50 @@ Future<void> _updateEmployee() async {
   }
 }
 
-
-
-  Future<String?> _uploadFile(PlatformFile file) async {
-    try {
-      final fileRef = FirebaseStorage.instance
-          .ref()
-          .child('contract_documents/${file.name}');
-      final uploadTask = fileRef.putFile(File(file.path!));
-      final snapshot = await uploadTask;
-      return await snapshot.ref.getDownloadURL();
-    } catch (e) {
-      print('File upload error: $e');
-      return null;
-    }
+Future<String?> _uploadFile(PlatformFile file) async {
+  try {
+    final fileRef = FirebaseStorage.instance
+        .ref()
+        .child('contract_documents/${file.name}');
+    final uploadTask = fileRef.putFile(File(file.path!));
+    final snapshot = await uploadTask;
+    return await snapshot.ref.getDownloadURL();
+  } catch (e) {
+    print('File upload error: $e');
+    return null;
   }
+}
 
+Future<bool> sendEmail(String recipientEmail, String recipientName, String employeeId, String ispassword) async {
+  try {
+    // Generate a unique ID
+    var uuid = Uuid();
+    String uniqueId = uuid.v1();
+    String shortUniqueId = shortid.generate();
+    String username = 'almubeen104@gmail.com';
+    String password = 'xifzfoosrmurbxqj';
+    final smtpServer = gmail(username, password);
 
+    final message = mailer.Message()
+      ..from = mailer.Address(username)
+      ..recipients.add(recipientEmail)
+      ..subject = "Employee Creation Confirmation by Ateca"
+      ..html = "<p>Dear $recipientName,</p>"
+          "<p>Welcome to Ateca</p>"
+          "<p>We have successfully created an employee record for you. (ID: $employeeId)</p>"
+              "<p>Your account email is (Email: $recipientEmail)</p>"
+              "<p>Your account Password is (Password: $ispassword)</p>"
+              "<p> Please login on Ateca Employee Portal and give your feedback. </p>" 
+          "<p>Thank you for joining us!</p>"
+          "<p>Ateca Team</p>";  
 
+    final sendReport = await mailer.send(message, smtpServer);
+    print('Message sent: $sendReport');
+    return true;
+  } catch (error) {
+    print('Error sending email: $error');
+    return false;
+  }
+} 
 
-  
 }

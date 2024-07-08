@@ -1,17 +1,20 @@
 
 import 'dart:ui';
 
-import 'package:employe_portal/view/contract_employee.dart';
-import 'package:employe_portal/view/create_employee.dart';
-import 'package:employe_portal/view/pdfviewer.dart';
-import 'package:employe_portal/view/update_user.dart';
+import 'package:employe_portal/view/admin/contract_employee.dart';
+import 'package:employe_portal/view/admin/create_employee.dart';
+import 'package:employe_portal/view/admin/pdfviewer.dart';
+import 'package:employe_portal/view/admin/update_user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home_Screen extends StatefulWidget {
 
@@ -119,8 +122,8 @@ class _Home_ScreenState extends State<Home_Screen> {
            Center(
         child: CircleAvatar(
           backgroundImage: (widget.image != null && widget.image.isNotEmpty)
-              ? const AssetImage("assets/images/ateca.png") as ImageProvider:
-              NetworkImage(widget.image ),
+              ? 
+          NetworkImage(widget.image ):const AssetImage("assets/images/ateca.png") as ImageProvider,
             
           radius: 70,
         ),
@@ -688,15 +691,92 @@ Column(
             ),
           ),
         ),
-      ],
-    ],
+SizedBox(height: 10,),
+ Container(
+
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: ElevatedButton(
+     
+   style: ElevatedButton.styleFrom(
+  backgroundColor: Colors.red
   ),
+                onPressed: () async {
+                  bool? confirmed = await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title:  const Text("Confirm Deletion", style:TextStyle(color: Color(0xff2476BD)) ,),
+                        content: const Text(
+                            "Are you sure you want to delete this employee?"),
+                        actions: [
+                          TextButton(
+                            child: const Text("Cancel", style:TextStyle(color: Color(0xff2476BD)) ),
+                            onPressed: () {
+                              Navigator.of(context).pop(false);
+                            },
+                          ),
+                          TextButton(
+                            child: const Text("Delete", style:TextStyle(color: Color(0xff2476BD)) ),
+                            onPressed: () {
+                              Navigator.of(context).pop(true);
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+
+                  if (confirmed == true) {
+                    // Delete the document from Firestore
+                   try {
+  // Query the Firestore collection for the document with the specified email
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      .collection('AllEmployees')
+      .where('email', isEqualTo: widget.email)
+      .get();
+
+  // Delete each document found
+  for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+    await doc.reference.delete();
+  }
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      
+      backgroundColor: Color(0xff2476BD),
+      content: Text('Employee deleted successfully.', style: TextStyle(color: Colors.white ),),
+    ),
+  );
+
+  Navigator.pop(context); // Return to the previous screen
+} catch (e) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+         backgroundColor: Color(0xff2476BD),
+      content: Text('Failed to delete employee: $e', style: TextStyle(color: Colors.white),),
+    ),
+  );
+}
+
+               
+  }
+  },
+   child: const Text("Remove Employee", style: TextStyle(color: Colors.white),)
+   ),
+            ),
+          ],
+        
+      
+      
+    
+  
            const SizedBox(height: 50,
            )
           ],
         ),
-      ),
-    );
+      ]),
+     ) );
   }
 dynamic launchEmail() async {
   try{

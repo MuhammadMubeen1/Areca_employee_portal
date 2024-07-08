@@ -2,7 +2,8 @@
     <application
         android:label="Ateca Employee Portal"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+  
+        android:icon="@mipmap/ateca">
         <activity
             android:name=".MainActivity"
             android:exported="true"

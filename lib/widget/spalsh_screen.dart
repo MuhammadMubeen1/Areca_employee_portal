@@ -1,8 +1,8 @@
 import 'package:employe_portal/controllor/login_controllor.dart';
 import 'package:employe_portal/view/user/user_inof.dart';
-import 'package:employe_portal/view/users_screen.dart';
+import 'package:employe_portal/view/admin/users_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:employe_portal/view/login_screen.dart';
+import 'package:employe_portal/view/admin/login_screen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
